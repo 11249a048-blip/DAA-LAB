@@ -1,128 +1,62 @@
-{
-  "nbformat": 4,
-  "nbformat_minor": 0,
-  "metadata": {
-    "colab": {
-      "provenance": [],
-      "authorship_tag": "ABX9TyNcaAlLmVh9HcCfLk59ZzBF",
-      "include_colab_link": true
-    },
-    "kernelspec": {
-      "name": "python3",
-      "display_name": "Python 3"
-    },
-    "language_info": {
-      "name": "python"
-    }
-  },
-  "cells": [
-    {
-      "cell_type": "markdown",
-      "metadata": {
-        "id": "view-in-github",
-        "colab_type": "text"
-      },
-      "source": [
-        "<a href=\"https://colab.research.google.com/github/11249a048-blip/DAA-LAB/blob/main/6a%20daa%20lab\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
-      ]
-    },
-    {
-      "cell_type": "code",
-      "execution_count": 4,
-      "metadata": {
-        "colab": {
-          "base_uri": "https://localhost:8080/",
-          "height": 0
-        },
-        "id": "sCs_zZR09H1K",
-        "outputId": "8530dbef-47a9-4fa1-fb76-fdd15a695ee4"
-      },
-      "outputs": [
-        {
-          "output_type": "stream",
-          "name": "stdout",
-          "text": [
-            "Vertex\tDistance from source\n",
-            "A\t0\n",
-            "B\t1\n",
-            "C\t2\n",
-            "D\t4\n",
-            "E\t2\n",
-            "F\t3\n"
-          ]
+#include <stdio.h>
+#include <limits.h>
+#include <stdbool.h>
+
+#define V 6
+
+int min_dist(int dist[], bool visited[]) {
+    int minimum = INT_MAX, ind = -1;
+
+    for (int i = 0; i < V; i++) {
+        if (!visited[i] && dist[i] < minimum) {
+            minimum = dist[i];
+            ind = i;
         }
-      ],
-      "source": [
-        "%%bash\n",
-        "\n",
-        "cat <<EOF > dijkstra.c\n",
-        "#include <stdio.h>\n",
-        "#include <limits.h>\n",
-        "#include <stdbool.h>\n",
-        "\n",
-        "#define V 6\n",
-        "\n",
-        "int min_dist(int dist[], bool visited[]) {\n",
-        "    int minimum = INT_MAX, ind = -1;\n",
-        "\n",
-        "    for (int i = 0; i < V; i++) {\n",
-        "        if (!visited[i] && dist[i] < minimum) {\n",
-        "            minimum = dist[i];\n",
-        "            ind = i;\n",
-        "        }\n",
-        "    }\n",
-        "    return ind;\n",
-        "}\n",
-        "\n",
-        "void greedy_dijkstra(int graph[V][V], int src) {\n",
-        "    int dist[V];\n",
-        "    bool visited[V];\n",
-        "\n",
-        "    for (int i = 0; i < V; i++) {\n",
-        "        dist[i] = INT_MAX;\n",
-        "        visited[i] = false;\n",
-        "    }\n",
-        "\n",
-        "    dist[src] = 0;\n",
-        "\n",
-        "    for (int count = 0; count < V - 1; count++) {\n",
-        "        int m = min_dist(dist, visited);\n",
-        "        if (m == -1) break; // safety check\n",
-        "\n",
-        "        visited[m] = true;\n",
-        "\n",
-        "        for (int j = 0; j < V; j++) {\n",
-        "            if (!visited[j] && graph[m][j] && dist[m] != INT_MAX &&\n",
-        "                dist[m] + graph[m][j] < dist[j]) {\n",
-        "                dist[j] = dist[m] + graph[m][j];\n",
-        "            }\n",
-        "        }\n",
-        "    }\n",
-        "\n",
-        "    printf(\"Vertex\\tDistance from source\\n\");\n",
-        "    for (int i = 0; i < V; i++) {\n",
-        "        printf(\"%c\\t%d\\n\", 'A' + i, dist[i]);\n",
-        "    }\n",
-        "}\n",
-        "\n",
-        "int main() {\n",
-        "    int graph[V][V] = {\n",
-        "        {0, 1, 2, 0, 0, 0},\n",
-        "        {1, 0, 0, 5, 1, 0},\n",
-        "        {2, 0, 0, 2, 3, 0},\n",
-        "        {0, 5, 2, 0, 2, 2},\n",
-        "        {0, 1, 3, 2, 0, 1},\n",
-        "        {0, 0, 0, 2, 1, 0}\n",
-        "    };\n",
-        "\n",
-        "    greedy_dijkstra(graph, 0);\n",
-        "    return 0;\n",
-        "}\n",
-        "EOF\n",
-        "\n",
-        "gcc dijkstra.c -o dijkstra\n",
-        "./dijkstra"
-      ]
     }
-  ]
+    return ind;
+}
+
+void greedy_dijkstra(int graph[V][V], int src) {
+    int dist[V];
+    bool visited[V];
+
+    for (int i = 0; i < V; i++) {
+        dist[i] = INT_MAX;
+        visited[i] = false;
+    }
+
+    dist[src] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int m = min_dist(dist, visited);
+        if (m == -1) break; // safety check
+
+        visited[m] = true;
+
+        for (int j = 0; j < V; j++) {
+            if (!visited[j] && graph[m][j] && dist[m] != INT_MAX &&
+                dist[m] + graph[m][j] < dist[j]) {
+                dist[j] = dist[m] + graph[m][j];
+            }
+        }
+    }
+
+    printf("Vertex\tDistance from source\n");
+    for (int i = 0; i < V; i++) {
+        printf("%c\t%d\n", 'A' + i, dist[i]);
+    }
+}
+
+int main() {
+    int graph[V][V] = {
+        {0, 1, 2, 0, 0, 0},
+        {1, 0, 0, 5, 1, 0},
+        {2, 0, 0, 2, 3, 0},
+        {0, 5, 2, 0, 2, 2},
+        {0, 1, 3, 2, 0, 1},
+        {0, 0, 0, 2, 1, 0}
+    };
+
+    greedy_dijkstra(graph, 0);
+    return 0;
 }
